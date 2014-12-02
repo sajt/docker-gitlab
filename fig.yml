@@ -1,16 +1,32 @@
-postgresql:
-  image: sameersbn/postgresql:9.1-1
+mysql:
+  image: sameersbn/mysql:latest
   environment:
     - DB_USER=gitlab
-    - DB_PASS=secretpassword
+    - DB_PASS=gitlab
     - DB_NAME=gitlabhq_production
+    - DB_HOST=192.168.0.2
 gitlab:
-  image: sameersbn/gitlab:7.5.2
+  image: sajt/gitlab:7.5.2
   links:
    - redis:redisio
-   - postgresql:postgresql
+   - mysql:mysql
   ports:
    - "10080:80"
    - "10022:22"
+   - "443:443"
+  environment:
+   - GITLAB_SSH_PORT=10022
+   - GITLAB_PORT=443
+   - GITLAB_HTTPS=true
+   - SSL_SELF_SIGNED=true
+   - GITLAB_HTTPS_HSTS_MAXAGE=2592000
+   - SMTP_ENABLED=true
+   - SMTP_USER= #push your e-mail addrss
+   - SMTP_PASS= #and the pass
+  volumes:
+   - /opt/gitlab/data:/home/git/data
 redis:
   image: sameersbn/redis:latest
+  environment: 
+    - REDIS_HOST=192.168.0.2
+    - REDIS_PORT=6379
